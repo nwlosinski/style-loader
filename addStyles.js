@@ -10,15 +10,13 @@ var stylesInDom = {},
 			return memo;
 		};
 	},
-	isOldIE = memoize(function() {
-		return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
-	}),
-	getHeadElement = memoize(function () {
-		return document.head || document.getElementsByTagName("head")[0];
-	}),
 	singletonElement = null,
 	singletonCounter = 0,
-	styleElementsInsertedAtTop = [];
+	styleElementsInsertedAtTop = [],
+    window = window,
+	document = window.document,
+	isOldIE,
+	getHeadElement;
 
 module.exports = function(list, options) {
 	if(typeof DEBUG !== "undefined" && DEBUG) {
@@ -32,6 +30,23 @@ module.exports = function(list, options) {
 
 	// By default, add <style> tags to the bottom of <head>.
 	if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
+
+	if (options.window === "top") {
+        window = window.top;
+        document = window.top.document;
+    }
+
+    if(!isOldIE || !getHeadElement) {
+
+        isOldIE = memoize(function () {
+            return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+        });
+
+        getHeadElement = memoize(function () {
+            return document.head || document.getElementsByTagName("head")[0];
+        });
+
+    }
 
 	var styles = listToStyles(list);
 	addStylesToDom(styles, options);
@@ -57,7 +72,7 @@ module.exports = function(list, options) {
 			}
 		}
 	};
-}
+};
 
 function addStylesToDom(styles, options) {
 	for(var i = 0; i < styles.length; i++) {
