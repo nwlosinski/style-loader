@@ -13,8 +13,8 @@ var stylesInDom = {},
 	singletonElement = null,
 	singletonCounter = 0,
 	styleElementsInsertedAtTop = [],
-    window = window,
-	document = window.document,
+    win,
+	doc,
 	isOldIE,
 	getHeadElement;
 
@@ -32,18 +32,21 @@ module.exports = function(list, options) {
 	if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
 
 	if (options.window === "top") {
-        window = window.top;
-        document = window.top.document;
-    }
+        win = window.top;
+        doc = window.top.document;
+    }else{
+		win = window;
+		doc = win.document;
+	}
 
     if(!isOldIE || !getHeadElement) {
 
         isOldIE = memoize(function () {
-            return /msie [6-9]\b/.test(window.navigator.userAgent.toLowerCase());
+            return /msie [6-9]\b/.test(win.navigator.userAgent.toLowerCase());
         });
 
         getHeadElement = memoize(function () {
-            return document.head || document.getElementsByTagName("head")[0];
+            return doc.head || doc.getElementsByTagName("head")[0];
         });
 
     }
@@ -142,14 +145,14 @@ function removeStyleElement(styleElement) {
 }
 
 function createStyleElement(options) {
-	var styleElement = document.createElement("style");
+	var styleElement = doc.createElement("style");
 	styleElement.type = "text/css";
 	insertStyleElement(options, styleElement);
 	return styleElement;
 }
 
 function createLinkElement(options) {
-	var linkElement = document.createElement("link");
+	var linkElement = doc.createElement("link");
 	linkElement.rel = "stylesheet";
 	insertStyleElement(options, linkElement);
 	return linkElement;
@@ -212,7 +215,7 @@ function applyToSingletonTag(styleElement, index, remove, obj) {
 	if (styleElement.styleSheet) {
 		styleElement.styleSheet.cssText = replaceText(index, css);
 	} else {
-		var cssNode = document.createTextNode(css);
+		var cssNode = doc.createTextNode(css);
 		var childNodes = styleElement.childNodes;
 		if (childNodes[index]) styleElement.removeChild(childNodes[index]);
 		if (childNodes.length) {
@@ -237,7 +240,7 @@ function applyToTag(styleElement, obj) {
 		while(styleElement.firstChild) {
 			styleElement.removeChild(styleElement.firstChild);
 		}
-		styleElement.appendChild(document.createTextNode(css));
+		styleElement.appendChild(doc.createTextNode(css));
 	}
 }
 
