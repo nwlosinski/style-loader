@@ -1,7 +1,7 @@
 /*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
+ MIT License http://www.opensource.org/licenses/mit-license.php
+ Author Tobias Koppers @sokra
+ */
 var stylesInDom = {},
 	memoize = function(fn) {
 		var memo;
@@ -13,7 +13,7 @@ var stylesInDom = {},
 	singletonElement = null,
 	singletonCounter = 0,
 	styleElementsInsertedAtTop = [],
-    win,
+	win,
 	doc,
 	isOldIE,
 	getHeadElement;
@@ -24,32 +24,33 @@ module.exports = function(list, options) {
 	}
 
 	options = options || {};
+
+	if (options.window === "top") {
+		win = window.top;
+		doc = window.top.document;
+	}else{
+		win = window;
+		doc = win.document;
+	}
+
+	if(!isOldIE || !getHeadElement) {
+
+		isOldIE = memoize(function () {
+			return /msie [6-9]\b/.test(win.navigator.userAgent.toLowerCase());
+		});
+
+		getHeadElement = memoize(function () {
+			return doc.head || doc.getElementsByTagName("head")[0];
+		});
+
+	}
+
 	// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
 	// tags it will allow on a page
 	if (typeof options.singleton === "undefined") options.singleton = isOldIE();
 
 	// By default, add <style> tags to the bottom of <head>.
 	if (typeof options.insertAt === "undefined") options.insertAt = "bottom";
-
-	if (options.window === "top") {
-        win = window.top;
-        doc = window.top.document;
-    }else{
-		win = window;
-		doc = win.document;
-	}
-
-    if(!isOldIE || !getHeadElement) {
-
-        isOldIE = memoize(function () {
-            return /msie [6-9]\b/.test(win.navigator.userAgent.toLowerCase());
-        });
-
-        getHeadElement = memoize(function () {
-            return doc.head || doc.getElementsByTagName("head")[0];
-        });
-
-    }
 
 	var styles = listToStyles(list);
 	addStylesToDom(styles, options);
