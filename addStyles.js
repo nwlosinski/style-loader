@@ -148,6 +148,7 @@ function removeStyleElement(styleElement) {
 function createStyleElement(options) {
 	var styleElement = doc.createElement("style");
 	styleElement.type = "text/css";
+	styleElement.className = "jpx-ad-element";
 	insertStyleElement(options, styleElement);
 	return styleElement;
 }
@@ -155,6 +156,7 @@ function createStyleElement(options) {
 function createLinkElement(options) {
 	var linkElement = doc.createElement("link");
 	linkElement.rel = "stylesheet";
+	linkElement.className = "jpx-ad-element";
 	insertStyleElement(options, linkElement);
 	return linkElement;
 }
